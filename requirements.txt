@@ -1,0 +1,7 @@
+numpy==1.23.5
+numpy==1.24.2
+opencv_python==4.7.0.72
+Pillow==9.0.1
+Pillow==10.3.0
+prettytable==3.10.0
+pycryptodome==3.20.0

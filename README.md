@@ -31,6 +31,15 @@ Client Commands
 ```
 
 
+## Installation
+
+AOX Reverse Shell requires Python 3 and certain dependencies. Use pip to install the required packages:
+
+```
+pip install -r requirements.txt
+
+```
+
 
 
 
