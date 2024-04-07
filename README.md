@@ -1,29 +1,15 @@
 # AOX Reverse Shell
 
-Python Reverse shell
-
-## Simple multiclient python reverse shell with extra functionalities
-![](images/connectionDiagram.PNG)
-
-Firstly run the server program using any available python IDE and ensure the interpreter is running python 3. 
-Wait for a few seconds allowing the listener to actively listen for new connection before running the client program
+Simple multiclient python reverse shell with extra functionalities
 
 
-## Accessing active connection list 
 
-Simply run the 'list' command to display all active connection to the server in a tabular fashion. 
-![](images/list.PNG)
-
-## Starting a session 
-
-To start a session with a connected node simply use the "select" statement followed by the client ID of the connected node
-![](images/session.PNG)
 
 
 ## Features 
 
 
-````
+```
 AOX Shell Commands 
 
     'list':['lists all active connections'] 
@@ -42,3 +28,5 @@ Client Commands
     'send (filename or path)':['send file from server and stores it on the victim's machine'] 
 
 ```
+
+
