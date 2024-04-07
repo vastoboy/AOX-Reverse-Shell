@@ -1,8 +1,9 @@
 # AOX Reverse Shell
 
-Simple multiclient python reverse shell with extra functionalities
+<img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue" alt="Python"><img src="https://img.shields.io/badge/Sqlite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="sqlite"><img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows"><img src="https://img.shields.io/badge/VirtualBox-21416b?style=for-the-badge&logo=VirtualBox&logoColor=white" alt="Virtualbox">
 
 
+The AOX Reverse Shell is a simple multiclient Python reverse shell with extra functionalities designed to provide remote control and management capabilities over multiple client machines. This tool allows you to establish reverse connections with client machines, enabling remote execution of commands and additional features.
 
 
 
@@ -28,5 +29,15 @@ Client Commands
     'send (filename or path)':['send file from server and stores it on the victim's machine'] 
 
 ```
+
+
+
+
+
+## Disclaimer
+
+This code is intended for educational and informational purposes only. Use it responsibly and ensure compliance with applicable laws and regulations. Respect the privacy and security of others.  
+The author of this code assume no liability and is not responsible for misuses or damages caused by any code contained in this repository in any event that, accidentally or otherwise, it comes to be utilized by a threat agent or unauthorized entity as a means to compromise the security, privacy, confidentiality, integrity, and/or availability of systems and their associated resources. In this context the term "compromise" is henceforth understood as the leverage of exploitation of known or unknown vulnerabilities present in said systems, including, but not limited to, the implementation of security controls, human or electronically-enabled.
+
 
 
