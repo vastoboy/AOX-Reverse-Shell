@@ -1,3 +1,7 @@
+# Created by Vasto Boy
+
+# Disclaimer: This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal.
+
 import os
 from aox_server import AOXServer
 
@@ -16,7 +20,7 @@ print(art)
 
 
 client_folder = "ClientFolder"
-aox_server = AOXServer("192.168.1.209", 4001, client_folder)
+aox_server = AOXServer("IP-ADDRESS", "PORT-1", client_folder, "ClientDB.db", "clientDetails")
 
 
 if not os.path.exists(client_folder):

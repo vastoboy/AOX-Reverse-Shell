@@ -5,5 +5,5 @@
 from aox_client import AOXClient
 
 
-aox_client = AOXClient("192.168.1.209", 4001)
+aox_client = AOXClient("IP-ADDRESS", "PORT-1")
 aox_client.establish_connection()
