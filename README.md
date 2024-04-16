@@ -26,7 +26,7 @@ Client Commands
     'encrypt (password) (directory)':['encrypts all files in the directory specified'] ['if directory is not specified all files in the current directory will be encrypted']
     'decrypt (password) (directory)':['decrypts all files in the directory specified'] ['if directory is not specified all files in the current directory will be decrypted']
     'get (filename or path)':['gets file from the victim's machine and sends it over to the server']
-    'send (filename or path)':['send file from server and stores it on the victim's machine'] 
+    'send (absolute path)':['send file from server and stores it on the victim's machine'] 
 
 ```
 
