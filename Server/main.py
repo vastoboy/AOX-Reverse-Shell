@@ -20,7 +20,7 @@ print(art)
 
 
 client_folder = "ClientFolder"
-aox_server = AOXServer("IP-ADDRESS", "PORT-1", client_folder, "ClientDB.db", "clientDetails")
+aox_server = AOXServer("IP-ADDRESS", 5000, client_folder, "ClientDB.db", "clientDetails")
 
 
 if not os.path.exists(client_folder):

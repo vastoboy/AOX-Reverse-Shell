@@ -10,8 +10,8 @@ from prettytable import from_db_cursor
 
 class SqlHandler:
 	def __init__(self, database_name, database_table_name):
-		self.database_name = "ClientDB.db"
-		self.database_table_name = "clientDetails"
+		self.database_name = database_name
+		self.database_table_name = database_table_name
 
 
 
